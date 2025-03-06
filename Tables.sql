@@ -111,18 +111,12 @@ CREATE TABLE Intervention (
     date DATE,
     id_intervenor INT,
     id_device INT,
+    id_ticket INT,
     price DECIMAL(10,2),
     object_description CLOB,
     FOREIGN KEY (id_intervenor) REFERENCES User(id) ON DELETE SET NULL,
-    FOREIGN KEY (id_device) REFERENCES Device(id) ON DELETE SET NULL
-);
-
-CREATE TABLE Ticket_Intervention (
-    id_ticket INT,
-    id_intervention INT,
-    PRIMARY KEY (id_ticket, id_intervention),
-    FOREIGN KEY (id_ticket) REFERENCES Ticket(id) ON DELETE CASCADE,
-    FOREIGN KEY (id_intervention) REFERENCES Intervention(id) ON DELETE CASCADE
+    FOREIGN KEY (id_device) REFERENCES Device(id) ON DELETE SET NULL,
+    FOREIGN KEY (id_ticke) REFERENCES Ticket(id) ON DELETE SET NULL
 );
 
 CREATE TABLE Bill (
