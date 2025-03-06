@@ -10,41 +10,36 @@ CREATE TABLE Device (
     object_description CLOB,
     type VARCHAR(50),
     price DECIMAL(10,2),
+    date_achat DATE,
     id_network INT, -- Clé étrangère vers Network
-    ip_address VARCHAR(16),
+    ip_address VARCHAR(16), 
     FOREIGN KEY (id_network) REFERENCES Network(id) ON DELETE SET NULL
 );
 
 CREATE TABLE Peripheral (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    id_device INT,
+    id_device INT, -- Clé étrangère vers Device
     object_description CLOB,
     type VARCHAR(50),
     price DECIMAL(10,2),
+    date_achat DATE,
     FOREIGN KEY (id_device) REFERENCES Device(id) ON DELETE CASCADE
 );
 
 CREATE TABLE VM (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    id_device INT,
+    id_device INT, -- Clé étrangère vers Device
     object_description CLOB,
     FOREIGN KEY (id_device) REFERENCES Device(id) ON DELETE CASCADE
 );
 
 CREATE TABLE License_Device (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    id_device INT,
+    id_device INT, -- Clé étrangère vers Device
     price DECIMAL(10,2),
     expiration_date DATE,
+    date_achat DATE,
     FOREIGN KEY (id_device) REFERENCES Device(id) ON DELETE CASCADE
-);
-
-CREATE TABLE License_User (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    id_user INT,
-    price DECIMAL(10,2),
-    expiration_date DATE,
-    FOREIGN KEY (id_user) REFERENCES User(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Network (
@@ -74,16 +69,18 @@ CREATE TABLE Permission (
 );
 
 CREATE TABLE Group_user (
-    id_user INT,
-    id_permission INT,
+    -- Couple de clés primaires
+    id_user INT, -- Clé étrangère vers User
+    id_permission INT, -- Clé étrangère vers Permission
     PRIMARY KEY (id_group, id_permission),
     FOREIGN KEY (id_group) REFERENCES User(id) ON DELETE CASCADE,
     FOREIGN KEY (id_permission) REFERENCES Permission(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Group_permission (
-    id_group INT,
-    id_permission INT,
+    -- Couple de clés primaires
+    id_group INT, -- Clé étrangère vers Group
+    id_permission INT, -- Clé étrangère vers Permission
     PRIMARY KEY (id_group, id_permission),
     FOREIGN KEY (id_group) REFERENCES Glpi_group(id) ON DELETE CASCADE,
     FOREIGN KEY (id_permission) REFERENCES Permission(id) ON DELETE CASCADE
@@ -97,9 +94,9 @@ CREATE TABLE Ticket (
     id INT PRIMARY KEY AUTO_INCREMENT,
     subject VARCHAR(255),
     object_description CLOB,
-    id_user_client INT,
-    id_intervention INT,
-    id_projet INT,
+    id_user_client INT, -- Clé étrangère vers User 
+    id_intervention INT, -- Clé étrangère vers Intervention
+    id_projet INT, -- Clé étrangère vers Projet
     Ticket_Status VARCHAR(20),
     FOREIGN KEY (id_user_client) REFERENCES User(id) ON DELETE SET NULL,
     FOREIGN KEY (id_intervention) REFERENCES Intervention(id) ON DELETE SET NULL,
@@ -108,22 +105,15 @@ CREATE TABLE Ticket (
 
 CREATE TABLE Intervention (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    date DATE,
-    id_intervenor INT,
-    id_device INT,
-    id_ticket INT,
+    date_intervention DATE,
+    id_intervenor INT, -- Clé étrangère vers User
+    id_device INT, -- Clé étrangère vers Device
+    id_ticket INT, -- Clé étrangère vers Ticket
     price DECIMAL(10,2),
     object_description CLOB,
     FOREIGN KEY (id_intervenor) REFERENCES User(id) ON DELETE SET NULL,
     FOREIGN KEY (id_device) REFERENCES Device(id) ON DELETE SET NULL,
     FOREIGN KEY (id_ticke) REFERENCES Ticket(id) ON DELETE SET NULL
-);
-
-CREATE TABLE Bill (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    date DATE,
-    total DECIMAL(10,2),
-    name VARCHAR(50)
 );
 
 CREATE TABLE Project (
