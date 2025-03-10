@@ -1,5 +1,6 @@
 -- Role
 alter session set "_ORACLE_SCRIPT"=true;
+
 CREATE ROLE Admin;
 CREATE ROLE Network_technician;
 CREATE ROLE Machine_technician;
@@ -65,3 +66,51 @@ GRANT CONNECT TO project_manager_jean_pierre;
 GRANT CONNECT TO client_iggy;
 GRANT CONNECT TO client_okuyasu;
 GRANT CONNECT TO client_johnny;
+
+-- Permissions
+GRANT DBA to Admin;
+
+GRANT UPDATE, DELETE, INSERT, SELECT ON NETWORK to Network_technician;
+
+GRANT UPDATE, DELETE, INSERT, SELECT ON DEVICE TO Machine_technician;
+GRANT UPDATE, DELETE, INSERT, SELECT ON PERIPHERAL TO Machine_technician;
+GRANT UPDATE, DELETE, INSERT, SELECT ON VM TO Machine_technician;
+GRANT UPDATE, DELETE, INSERT, SELECT ON LICENCE_DEVICE TO Machine_technician;
+
+GRANT INSERT ON DEVICE TO Technical_manager;
+GRANT INSERT ON PERIPHERAL TO Technical_manager;
+GRANT INSERT ON VM TO Technical_manager;
+GRANT INSERT ON LICENCE_DEVICE TO Technical_manager;
+
+-- Permissions sur les vues (à tester)
+GRANT SELECT ON Prix_Device TO Accountant;
+GRANT SELECT ON Prix_Peripheral TO Accountant;
+GRANT SELECT ON Prix_Licences TO Accountant;
+GRANT SELECT ON Prix_Intervention TO Accountant;
+
+GRANT UPDATE, DELETE, INSERT, SELECT ON TICKET TO Project_manager;
+GRANT UPDATE, DELETE, INSERT, SELECT ON PROJECT TO Project_manager;
+GRANT UPDATE, DELETE, INSERT, SELECT ON INTERVENTION TO Project_manager;
+
+GRANT UPDATE ON INTERVENTION TO Technical_manager;
+
+GRANT INSERT ON TICKET TO Client;
+
+GRANT SELECT ON PERIPHERAL TO Client;
+GRANT SELECT ON DEVICE TO Client;
+GRANT SELECT ON VM TO Client;
+GRANT SELECT ON LICENCE_DEVICE TO Client;
+
+
+-- Permissions sur les users
+GRANT Admin to admin_giorno;
+
+GRANT Network_technician, Client TO network_technician_jonhatan;
+
+GRANT Machine_technician, Client TO machine_technician_dio;
+
+GRANT Machine_technician, Network_technician, Technical_manager, Client TO technical_manager_jotaro;
+
+GRANT Project_manager, Client TO project_manager_jean_pierre;
+
+GRANT Accountant TO accountant_jolyne;
