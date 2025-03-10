@@ -1,15 +1,15 @@
-CREATE DATABASE Gestion_Informatique;
-USE Gestion_Informatique;
+-- CREATE DATABASE Gestion_Informatique;
+-- USE Gestion_Informatique;
 
 -- ======================
 -- Table Matériel
 -- ======================
 
 CREATE TABLE Device (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT PRIMARY KEY,
     object_description CLOB,
     type VARCHAR(50),
-    price DECIMAL(10,2),
+    price NUMBER(10,2),
     date_achat DATE,
     id_network INT, -- Clé étrangère vers Network
     ip_address VARCHAR(16), 
@@ -17,33 +17,33 @@ CREATE TABLE Device (
 );
 
 CREATE TABLE Peripheral (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT PRIMARY KEY,
     id_device INT, -- Clé étrangère vers Device
     object_description CLOB,
     type VARCHAR(50),
-    price DECIMAL(10,2),
+    price NUMBER(10,2),
     date_achat DATE,
     FOREIGN KEY (id_device) REFERENCES Device(id) ON DELETE CASCADE
 );
 
 CREATE TABLE VM (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT PRIMARY KEY,
     id_device INT, -- Clé étrangère vers Device
     object_description CLOB,
     FOREIGN KEY (id_device) REFERENCES Device(id) ON DELETE CASCADE
 );
 
 CREATE TABLE License_Device (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT PRIMARY KEY,
     id_device INT, -- Clé étrangère vers Device
-    price DECIMAL(10,2),
+    price NUMBER(10,2),
     expiration_date DATE,
     date_achat DATE,
     FOREIGN KEY (id_device) REFERENCES Device(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Network (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT PRIMARY KEY,
     net_alias VARCHAR(20),
     ip_address VARCHAR(16),
     ip_mask VARCHAR(16)
@@ -55,16 +55,16 @@ CREATE TABLE Network (
 -- ======================
 
 CREATE TABLE User (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT PRIMARY KEY,
     name VARCHAR(50),
     first_name VARCHAR(50)
 );
 CREATE TABLE Glpi_group (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT PRIMARY KEY,
     name VARCHAR(50)
 );
 CREATE TABLE Permission (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT PRIMARY KEY,
     name VARCHAR(50)
 );
 
@@ -91,7 +91,7 @@ CREATE TABLE Group_permission (
 -- ======================
 
 CREATE TABLE Ticket (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT PRIMARY KEY,
     subject VARCHAR(255),
     object_description CLOB,
     id_user_client INT, -- Clé étrangère vers User 
@@ -104,12 +104,12 @@ CREATE TABLE Ticket (
 );
 
 CREATE TABLE Intervention (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT PRIMARY KEY,
     date_intervention DATE,
     id_intervenor INT, -- Clé étrangère vers User
     id_device INT, -- Clé étrangère vers Device
     id_ticket INT, -- Clé étrangère vers Ticket
-    price DECIMAL(10,2),
+    price NUMBER(10,2),
     object_description CLOB,
     FOREIGN KEY (id_intervenor) REFERENCES User(id) ON DELETE SET NULL,
     FOREIGN KEY (id_device) REFERENCES Device(id) ON DELETE SET NULL,
@@ -117,7 +117,7 @@ CREATE TABLE Intervention (
 );
 
 CREATE TABLE Project (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT PRIMARY KEY,
     name VARCHAR(100),
     object_description CLOB
 );
