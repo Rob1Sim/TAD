@@ -107,11 +107,11 @@ END get_all_network_infos;/
 --nombre de jour qui reste pour une licence
 CREATE OR REPLACE FUNCTION get_left_days_license(
 id_license NUMBER)
-RETURN NUMBER;
+RETURN NUMBER
 IS
     curr_date DATE;
     exp_date DATE;
-    days_left (5,2);
+    days_left NUMBER(5,2);
 BEGIN
     curr_date := SYSDATE;   -- getting current date
     SELECT expiration_date INTO exp_date FROM LICENCE_DEVICE ld -- getting the expiration date from the license's id
