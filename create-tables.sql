@@ -34,8 +34,8 @@ DROP TABLE USER_GROUP_PERMISSIONS;
 -- Création des TABLES
 CREATE TABLE PERIPHERAL (
     id NUMBER PRIMARY KEY,
-    p_description VARCHAR2(255),
-    p_type VARCHAR2(50),
+    description VARCHAR2(255),
+    type VARCHAR2(50),
     price NUMBER,
     buying_date DATE,
     id_device NUMBER
@@ -43,14 +43,14 @@ CREATE TABLE PERIPHERAL (
 
 CREATE TABLE VM (
     id NUMBER PRIMARY KEY,
-    vm_description VARCHAR2(255),
+    description VARCHAR2(255),
     id_device NUMBER NOT NULL
 ) TABLESPACE Device_network;
 
 CREATE TABLE DEVICE (
     id NUMBER PRIMARY KEY,
-    d_description VARCHAR2(255),
-    d_type VARCHAR2(50),
+    description VARCHAR2(255),
+    type VARCHAR2(50),
     price NUMBER,
     ip_address VARCHAR2(50),
     buying_date DATE,
@@ -61,8 +61,8 @@ CREATE TABLE DEVICE (
 
 CREATE TABLE NETWORK (
     id NUMBER PRIMARY KEY,
-    n_name VARCHAR2(100),
-    n_alias VARCHAR2(100),
+    name VARCHAR2(100),
+    alias VARCHAR2(100),
     ip_address VARCHAR2(50),
     ip_mask VARCHAR2(50)
 ) TABLESPACE Device_network;
@@ -78,8 +78,8 @@ CREATE TABLE INTERVENTION (
     id NUMBER PRIMARY KEY,
     inter_date DATE,
     price NUMBER,
-    i_description VARCHAR2(255),
-    i_type VARCHAR2(50),
+    description VARCHAR2(255),
+    type VARCHAR2(50),
     id_device NUMBER NOT NULL
 ) TABLESPACE Project_management;
 
@@ -94,7 +94,7 @@ CREATE TABLE AFFECTATION (
 CREATE TABLE TICKET (
     id NUMBER PRIMARY KEY,
     subject VARCHAR2(255),
-    t_description VARCHAR2(255),
+    description VARCHAR2(255),
     statut VARCHAR2(50) DEFAULT 'OPEN',
     ticket_creation_date DATE DEFAULT SYSDATE,
     id_created_by NUMBER,
@@ -109,19 +109,19 @@ CREATE TABLE GLPI_USER (
 
 CREATE TABLE PROJECT (
     id NUMBER PRIMARY KEY,
-    p_name VARCHAR2(100),
-    p_description VARCHAR2(255),
+    name VARCHAR2(100),
+    description VARCHAR2(255),
     creation_date DATE DEFAULT SYSDATE
 ) TABLESPACE Project_management;
 
 CREATE TABLE GROUPS (
     id NUMBER PRIMARY KEY,
-    g_name VARCHAR2(100)
+    name VARCHAR2(100)
 ) TABLESPACE User_group;
 
 CREATE TABLE PERMISSIONS (
     id NUMBER PRIMARY KEY,
-    perm_name VARCHAR2(100)
+    name VARCHAR2(100)
 ) TABLESPACE User_group;
 
 -- Tables NM
