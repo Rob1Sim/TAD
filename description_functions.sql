@@ -4,12 +4,12 @@ CREATE OR REPLACE PROCEDURE get_all_info_device(
 id_device NUMBER)
 IS
     CURSOR cur_per IS
-    SELECT p.id, p.description, p.type, p.price, p.buying_date FROM PERIPHERAL p, DEVICE d
+    SELECT p.id, p.p_description, p.p_type, p.price, p.buying_date FROM PERIPHERAL p, DEVICE d
     WHERE d.id = p.id_device;
     v_per cur_perm%rowtype;
 
     CURSOR cur_vm IS
-    SELECT  vm.id, vm.description FROM VM vm, DEVICE d
+    SELECT  vm.id, vm.vm_description FROM VM vm, DEVICE d
     WHERE d.id = vm.id_device;
     v_vm cur_vm%rowtype;
 
@@ -52,20 +52,20 @@ CREATE OR REPLACE PROCEDURE get_all_network_infos(
 id_network NUMBER)
 IS
     CURSOR cur_dev IS
-    SELECT d.id, d.description, d.type, d.price, d.ip_address, d.buying_date, d.guaranty_expiration_date FROM DEVICE d, NETWORK n
-    WHERE d.id_network = n.id;
+    SELECT d.id, d.d_description, d.d_type, d.price, d.ip_address, d.buying_date, d.guaranty_expiration_date FROM DEVICE d, NETWORK net
+    WHERE d.id_network = net.id;
     v_dev cur_dev%rowtype;
 
     CURSOR cur_per IS
-    SELECT p.id, p.description, p.type, p.price, p.buying_date FROM PERIPHERAL p, DEVICE d, NETWORK n
+    SELECT p.id, p.p_description, p.p_type, p.price, p.buying_date FROM PERIPHERAL p, DEVICE d, NETWORK net
     WHERE d.id = p.id_device
-    AND d.id_network = n.id;
+    AND d.id_network = net.id;
     v_per cur_perm%rowtype;
 
     CURSOR cur_vm IS
-    SELECT  vm.id, vm.description FROM VM vm, DEVICE d, NETWORK n
+    SELECT  vm.id, vm.vm_description FROM VM vm, DEVICE d, NETWORK net
     WHERE d.id = vm.id_device
-    AND d.id_network = n.id;
+    AND d.id_network = net.id;
     v_vm cur_vm%rowtype;
 
 BEGIN
@@ -128,7 +128,7 @@ CREATE OR REPLACE PROCEDURE get_group_rights(
 id_group NUMBER)
 IS
     CURSOR cur_perm IS
-    SELECT p.name FROM PERMISSIONS p, USER_GROUP_PERMISSIONS ugp, GROUPS g
+    SELECT p.perm_name FROM PERMISSIONS p, USER_GROUP_PERMISSIONS ugp, GROUPS g
     WHERE p.id = ugp.id_permission
     AND p.id_group = g.id;
     v_item cur_perm%rowtype;
@@ -149,7 +149,7 @@ CREATE OR REPLACE PROCEDURE get_user_rights(
 id_user NUMBER)
 IS
     CURSOR cur_perm IS
-    SELECT p.name FROM PERMISSIONS p, USER_GROUP_PERMISSIONS ugp, GLPI_USER gu
+    SELECT p.perm_name FROM PERMISSIONS p, USER_GROUP_PERMISSIONS ugp, GLPI_USER gu
     WHERE p.id = ugp.id_permission
     AND g.id_user = gu.id;
     v_item cur_perm%rowtype;
