@@ -55,7 +55,6 @@ CREATE TABLE DEVICE (
     ip_address VARCHAR2(50),
     buying_date DATE,
     guaranty_expiration_date DATE,
-    id_licence_device NUMBER,
     id_network NUMBER
 ) TABLESPACE Device_network;
 
@@ -71,7 +70,8 @@ CREATE TABLE LICENCE_DEVICE (
     id NUMBER PRIMARY KEY,
     price NUMBER,
     expiration_date DATE,
-    buying_date DATE
+    buying_date DATE,
+    id_device NUMBER
 ) TABLESPACE Device_network;
 
 CREATE TABLE INTERVENTION (
