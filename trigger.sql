@@ -24,9 +24,11 @@ BEGIN
     IF :NEW.expiration_date < :NEW.buying_date THEN
         RAISE_APPLICATION_ERROR(-20001, 'La date d''expiration doit être supérieure à la date d''achat');
     END IF;
-    IF :NEW.expiration_date < SYSDATE THEN
-        RAISE_APPLICATION_ERROR(-20002, 'La date d''expiration doit être supérieure à la date actuelle');
-    END IF;
+    
+    --IF :NEW.expiration_date < SYSDATE THEN
+      --  RAISE_APPLICATION_ERROR(-20002, 'La date d''expiration doit être supérieure à la date actuelle');
+    --END IF;
+    IS_DATE_VALID(:NEW.expiration_date);
 END;
 
 CREATE OR REPLACE TRIGGER TRG_before_insert_affecation
