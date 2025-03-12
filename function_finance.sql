@@ -17,19 +17,19 @@ FROM LICENCE_DEVICE;
 CREATE OR REPLACE FUNCTION price_ticket (id_ticket NUMBER) 
 RETURN NUMBER 
 IS
-    res NUMBER;
+    res NUMBER := 0;
     CURSOR curs IS 
     SELECT price FROM Prix_Intervention
     WHERE Prix_Intervention.id = id_ticket;
     temp price%rowtype;
 BEGIN
-    OPEN cur_clients;
+    OPEN curs;
     LOOP
-        FETCH cur_clients INTO temp;
-        EXIT WHEN cur_clients%NOTFOUND;
+        FETCH curs INTO temp;
+        EXIT WHEN curs%NOTFOUND;
         res := res + temp;
     END LOOP;
-    CLOSE cur_clients;
+    CLOSE curs;
 
   RETURN res;
 END;
@@ -37,10 +37,10 @@ END;
 CREATE OR REPLACE FUNCTION price_peripheral (id_device NUMBER) 
 RETURN NUMBER 
 IS
-    res NUMBER;
+    res NUMBER :=0;
 BEGIN
     FOR rec IN (SELECT price FROM Prix_Peripheral WHERE Prix_Peripheral.id = id_device) LOOP
-        res := rec + res;
+        res := rec.price + res;
   END LOOP;
   RETURN res;
 END;
@@ -48,10 +48,10 @@ END;
 CREATE OR REPLACE FUNCTION price_licence (id_device NUMBER) 
 RETURN NUMBER 
 IS
-    res NUMBER;
+    res NUMBER :=0 ;
 BEGIN
     FOR rec IN (SELECT price FROM Prix_Licence WHERE Prix_Licence.id = id_device) LOOP
-        res := rec + res;
+        res := rec.price + res;
   END LOOP;
   RETURN res;
 END;
@@ -61,7 +61,11 @@ RETURN NUMBER
 IS 
     res NUMBER;
 BEGIN
-    res := price_licence(id_device) + price_peripheral(id_device) + (SELECT price FROM DEVICE WHERE DEVICE.id = id_device;)
+    SELECT price INTO res FROM DEVICE WHERE id = id_device;
+        EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            res := 0;
+    res := res + price_licence(id_device) + price_peripheral(id_device);
     RETURN res;
 END;
 
@@ -71,7 +75,7 @@ IS
     res NUMBER;
 BEGIN
         FOR rec IN (SELECT id FROM DEVICE WHERE DEVICE.id_network = id_net) LOOP
-        res := res + setup_price(rex);
+        res := res + setup_price(rec);
         END LOOP;
         RETURN res;
-END
+END;
