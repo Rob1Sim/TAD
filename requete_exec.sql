@@ -43,4 +43,4 @@ SELECT * FROM TICKET WHERE statut = 'opened';
 SELECT * FROM TICKET WHERE statut = 'closed';
 
 --toute les dépenses entre deux dates
-EXEC total_depenses_func(TO_DATE('2025-03-31', 'YYYY-MM-DD'), TO_DATE('2025-03-31', 'YYYY-MM-DD'))
+EXEC total_depenses_func(TO_DATE('2025-04-01', 'YYYY-MM-DD'), TO_DATE('2025-04-02', 'YYYY-MM-DD'))
