@@ -11,7 +11,7 @@ BEGIN
     END LOOP;
     DBMS_OUTPUT.PUT_LINE('-------------------------------');
 END;
-
+/
 -- Vérifie si une date est valide
 CREATE OR REPLACE PROCEDURE is_date_valid(p_date DATE) IS
 BEGIN
@@ -19,7 +19,7 @@ BEGIN
         RAISE_APPLICATION_ERROR(-20001, 'La date doit être supérieure à la date actuelle');
     END IF;
 END;
-
+/
 -- Ajoute ou modifie un user 
 -- Séquence de GLPI_USER_ID
 CREATE SEQUENCE GLPI_USER_ID
@@ -42,3 +42,4 @@ BEGIN
         UPDATE GLPI_USER SET last_name = p_last_name, first_name = p_first_name WHERE id = p_id;
     END IF;
 END;
+/

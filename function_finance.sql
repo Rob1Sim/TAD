@@ -1,16 +1,16 @@
-CREATE VIEW Prix_Device AS
+CREATE OR REPLACE VIEW Prix_Device AS
 SELECT id, price, buying_date
 FROM DEVICE;
 
-CREATE VIEW Prix_Intervention AS
-SELECT id, price, buying_date
+CREATE OR REPLACE VIEW Prix_Intervention AS
+SELECT id, price, inter_date
 FROM INTERVENTION;
 
-CREATE VIEW Prix_Peripheral AS
+CREATE OR REPLACE VIEW Prix_Peripheral AS
 SELECT id, price, buying_date
 FROM PERIPHERAL;
 
-CREATE VIEW Prix_Licence AS
+CREATE OR REPLACE VIEW Prix_Licence AS
 SELECT id, price, buying_date
 FROM LICENCE_DEVICE;
 
@@ -21,7 +21,7 @@ IS
     CURSOR curs IS 
     SELECT price FROM Prix_Intervention
     WHERE Prix_Intervention.id = id_ticket;
-    temp price%rowtype;
+    temp Prix_Intervention.PRICE%TYPE;
 BEGIN
     OPEN curs;
     LOOP
@@ -33,7 +33,7 @@ BEGIN
 
   RETURN res;
 END;
-
+/
 CREATE OR REPLACE FUNCTION price_peripheral (id_device NUMBER) 
 RETURN NUMBER 
 IS
@@ -44,7 +44,7 @@ BEGIN
   END LOOP;
   RETURN res;
 END;
-
+/
 CREATE OR REPLACE FUNCTION price_licence (id_device NUMBER) 
 RETURN NUMBER 
 IS
@@ -55,19 +55,26 @@ BEGIN
   END LOOP;
   RETURN res;
 END;
-
+/
 CREATE OR REPLACE FUNCTION setup_price (id_device NUMBER)
 RETURN NUMBER
 IS 
-    res NUMBER;
+    res NUMBER := 0;
 BEGIN
-    SELECT price INTO res FROM DEVICE WHERE id = id_device;
-        EXCEPTION
+    -- Récupération du prix de l'appareil
+    BEGIN
+        SELECT price INTO res FROM DEVICE WHERE id = id_device;
+    EXCEPTION
         WHEN NO_DATA_FOUND THEN
             res := 0;
-    res := res + price_licence(id_device) + price_peripheral(id_device);
+    END;
+
+    -- Ajout des coûts supplémentaires
+    res := res + NVL(price_licence(id_device), 0) + NVL(price_peripheral(id_device), 0);
+    
     RETURN res;
 END;
+/
 
 CREATE OR REPLACE FUNCTION network_price (id_net NUMBER)
 RETURN NUMBER
@@ -75,7 +82,8 @@ IS
     res NUMBER;
 BEGIN
         FOR rec IN (SELECT id FROM DEVICE WHERE DEVICE.id_network = id_net) LOOP
-        res := res + setup_price(rec);
+        res := res + setup_price(rec.id);
         END LOOP;
         RETURN res;
 END;
+/

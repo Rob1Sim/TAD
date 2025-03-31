@@ -6,7 +6,7 @@ IS
         JOIN AFFECTATION a ON  i.id = a.id_intervention
         WHERE a.id_ticket = p_id_ticket;
     
-    v_ticket ticket%ROWTYPE;
+    v_intervention intervention%ROWTYPE;
 BEGIN
     OPEN intervention_cursor;
     LOOP
@@ -14,7 +14,7 @@ BEGIN
         EXIT WHEN intervention_cursor%NOTFOUND;
         
         DBMS_OUTPUT.PUT_LINE('ID: ' || v_intervention.id ||
-                     ', Date: ' || TO_CHAR(v_intervention.date, 'YYYY-MM-DD') ||
+                     ', Date: ' || TO_CHAR(v_intervention.inter_date, 'YYYY-MM-DD') ||
                      ', Price: ' || TO_CHAR(v_intervention.price, '9999.99') ||
                      ', Description: ' || v_intervention.description ||
                      ', Type: ' || v_intervention.type);
@@ -22,7 +22,7 @@ BEGIN
     END LOOP;
     CLOSE intervention_cursor;
 END;
-
+/
 
 
 --Sélectionner un ticket existant en fonction d’un user
@@ -52,7 +52,7 @@ BEGIN
     END LOOP;
     CLOSE ticket_cursor;
 END;
-
+/
 
 CREATE OR REPLACE PROCEDURE Device_ticket(p_id_device NUMBER)
 IS
@@ -80,7 +80,7 @@ BEGIN
     END LOOP;
     CLOSE ticket_cursor;
 END;
-
+/
 
 
 --Suppression d’un ticket
@@ -97,7 +97,7 @@ BEGIN
     DELETE FROM AFFECTATION WHERE id_ticket = :OLD.id;
     COMMIT;
 END;
-
+/
 --Update d’un ticket
 CREATE OR REPLACE PROCEDURE make_opened_ticket(p_id_ticket NUMBER)
 IS
@@ -105,25 +105,23 @@ BEGIN
     UPDATE TICKET SET statut = 'opened' WHERE id = p_id_ticket;
     COMMIT;
 END;
+/
+
 CREATE OR REPLACE PROCEDURE make_close_ticket(p_id_ticket NUMBER)
 IS
 BEGIN 
     UPDATE TICKET SET statut = 'closed' WHERE id = p_id_ticket;
     COMMIT;
 END;
---Sélectionner tous les tickets avec un statut précis.
-
-SELECT * FROM TICKET WHERE statut = 'opened';
-SELECT * FROM TICKET WHERE statut = 'closed';
+/
 
 
---Sélectionner tous les tickets ouverts (en cours) à une date précise.
+
+-- Sélectionner tous les tickets ouverts (en cours) à une date précise.
 CREATE OR REPLACE PROCEDURE Date_ticket(p_date DATE)
 IS
     CURSOR ticket_cursor IS
-        SELECT t.*
-        FROM ticket t
-        WHERE t.ticket_creation_date = p_date;
+        SELECT t.* FROM ticket t WHERE t.ticket_creation_date = p_date;
     
     v_ticket ticket%ROWTYPE;
 BEGIN
@@ -138,18 +136,18 @@ BEGIN
                      ', Ticket Creation Date: ' || TO_CHAR(v_ticket.ticket_creation_date, 'YYYY-MM-DD') ||
                      ', Created By: ' || v_ticket.id_created_by ||
                      ', Project ID: ' || v_ticket.id_project);
-
     END LOOP;
     CLOSE ticket_cursor;
 END;
---Fonction: Calculer le prix d’un ticket/projet
+/
+
+-- Fonction: Calculer le prix d’un ticket/projet
 CREATE OR REPLACE FUNCTION ticket_price(p_id_ticket NUMBER)
 RETURN NUMBER
 IS
     ticket_total_price NUMBER := 0;
 BEGIN
-
-    SELECT SUM(i.price) 
+    SELECT COALESCE(SUM(i.price), 0) --remplace NULL par 0
     INTO ticket_total_price
     FROM INTERVENTION i
     JOIN AFFECTATION a ON i.id = a.id_intervention
@@ -157,6 +155,7 @@ BEGIN
 
     RETURN ticket_total_price;
 END;
+/
 
 CREATE OR REPLACE FUNCTION project_price(p_id_project NUMBER)
 RETURN NUMBER
@@ -172,21 +171,25 @@ BEGIN
 
     RETURN total_project_price;
 END;
+/
 
+CREATE OR REPLACE FUNCTION total_depenses_func (
+    start_date IN DATE,
+    end_date IN DATE
+) RETURN NUMBER
+IS
+    total NUMBER := 0;
+BEGIN
+    -- Calcul des dépenses des interventions
+    SELECT COALESCE(SUM(price), 0) INTO total
+    FROM INTERVENTION
+    WHERE inter_date  BETWEEN start_date AND end_date;
 
---Tracker l’avancement (est ce que les interventions sont finie) ??
+    -- Ajout du coût d'installation des appareils achetés
+    FOR rec IN (SELECT id FROM DEVICE WHERE buying_date BETWEEN start_date AND end_date) LOOP
+        total := total + NVL(setup_price(rec.id), 0); --  Évite les erreurs si setup_price retourne NULL
+    END LOOP;
 
-
---TEST
-EXEC user_ticket(1);
-EXEC ticket_intervention(1);
-EXEC Device_ticket(1);
-DELETE FROM TICKET WHERE id=1;
-EXEC make_opened_ticket(2);
-EXEC make_close_ticket(3);
---Sélectionner tous les tickets avec un statut précis.
-SELECT * FROM TICKET WHERE statut = 'opened';
-SELECT * FROM TICKET WHERE statut = 'closed';
-EXEC Date_ticket(TO_DATE('2025-01-15', 'YYYY-MM-DD'));
-v_project_price := calculate_project_price(123);
-DBMS_OUTPUT.PUT_LINE('Le prix total du projet est : ' || calculate_project_price(1));
+    RETURN total;
+END;
+/

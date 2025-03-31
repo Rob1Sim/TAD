@@ -3,10 +3,10 @@ CREATE OR REPLACE TRIGGER TRG_delete_device
 BEFORE DELETE ON DEVICE
 FOR EACH ROW
 BEGIN
-    DELETE FROM LICENCE_DEVICE WHERE device_id = :OLD.id;
+    DELETE FROM LICENCE_DEVICE WHERE id_device = :OLD.id;
     DELETE FROM VM WHERE id = :OLD.id;
 END;
-
+/
 -- TODO:same qu'au dessus
 CREATE OR REPLACE TRIGGER TRG_delete_project
 BEFORE DELETE ON PROJECT
@@ -14,7 +14,7 @@ FOR EACH ROW
 BEGIN
     DELETE FROM TICKET WHERE id_project = :OLD.id;
 END;
-
+/
 -- TODO:Pour la 3e revoir parce que ça n'a pas de sens
 
 CREATE OR REPLACE TRIGGER TRG_before_insert_licence
@@ -30,18 +30,18 @@ BEGIN
     --END IF;
     IS_DATE_VALID(:NEW.expiration_date);
 END;
-
+/
 CREATE OR REPLACE TRIGGER TRG_before_insert_affecation
 BEFORE INSERT ON AFFECTATION
 FOR EACH ROW
 BEGIN
     :NEW.date_affectation := SYSDATE;   
 END;
-
+/
 CREATE OR REPLACE TRIGGER TRG_before_insert_project
 BEFORE INSERT ON PROJECT
 FOR EACH ROW
 BEGIN
     :NEW.creation_date := SYSDATE;
 END;
-
+/

@@ -2,9 +2,27 @@
 --====================
 -- INDEX CREATION
 --====================
+-- DROP INDEX ind_user_name;
+
+-- DROP INDEX ind_device_ip;
+
+-- DROP INDEX ind_license_exp_date;
+
+-- DROP INDEX ind_intervention_date;
+
+-- DROP INDEX IDX_USER_GROUP_USER;
+
+-- DROP INDEX IDX_USER_GROUP_GROUP;
+
+-- DROP INDEX IDX_UGP_USER;
+
+-- DROP INDEX IDX_UGP_GROUP;
+
+-- DROP INDEX IDX_UGP_PERMISSION;
+
 
 -- B-tree Index on the name of the GLPI_USER table (for the intervenors and users).
-CREATE INDEX ind_user_name ON GLPI_USER(name ASC);
+CREATE INDEX ind_user_name ON GLPI_USER(last_name ASC);
 
 -- B-tree Index on the IP_address of the DEVICE table.
 CREATE INDEX ind_device_ip ON DEVICE(ip_address ASC);
@@ -23,3 +41,7 @@ CREATE INDEX IDX_USER_GROUP_GROUP ON USER_GROUP(id_group);
 CREATE INDEX IDX_UGP_USER ON USER_GROUP_PERMISSIONS(id_user);
 CREATE INDEX IDX_UGP_GROUP ON USER_GROUP_PERMISSIONS(id_group);
 CREATE INDEX IDX_UGP_PERMISSION ON USER_GROUP_PERMISSIONS(id_permission);
+
+
+
+

@@ -85,10 +85,10 @@ GRANT INSERT ON LICENCE_DEVICE TO Technical_manager;
 -- Permissions sur les vues (à tester)
 GRANT SELECT ON Prix_Device TO Accountant;
 GRANT SELECT ON Prix_Peripheral TO Accountant;
-GRANT SELECT ON Prix_Licences TO Accountant;
+GRANT SELECT ON Prix_Licence TO Accountant;
 GRANT SELECT ON Prix_Intervention TO Accountant;
 GRANT SELECT ON TICKET TO Accountant;
-GRANT SELECT ON PROJET TO Accountant;
+GRANT SELECT ON PROJECT TO Accountant;
 GRANT UPDATE, DELETE, INSERT, SELECT ON TICKET TO Project_manager;
 GRANT UPDATE, DELETE, INSERT, SELECT ON PROJECT TO Project_manager;
 GRANT UPDATE, DELETE, INSERT, SELECT ON INTERVENTION TO Project_manager;
