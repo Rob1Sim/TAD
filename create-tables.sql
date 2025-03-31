@@ -116,17 +116,20 @@ CREATE TABLE PROJECT (
     creation_date DATE DEFAULT SYSDATE
 ) TABLESPACE Project_management;
 
+-- Pas à Pau
 CREATE TABLE GROUPS (
     id NUMBER PRIMARY KEY,
     name VARCHAR2(100)
 ) TABLESPACE User_group;
 
+-- Pas a Pau
 CREATE TABLE PERMISSIONS (
     id NUMBER PRIMARY KEY,
     name VARCHAR2(100)
 ) TABLESPACE User_group;
 
 -- Tables NM
+-- pas à PAU
 CREATE TABLE USER_GROUP (
     id_user NUMBER,
     id_group NUMBER,
@@ -135,7 +138,7 @@ CREATE TABLE USER_GROUP (
     FOREIGN KEY (id_group) REFERENCES GROUPS(id)
 ) TABLESPACE User_group;
 
-
+-- Pas à Pau
 CREATE TABLE USER_GROUP_PERMISSIONS (
     id NUMBER PRIMARY KEY,
     id_user NUMBER NULL,
