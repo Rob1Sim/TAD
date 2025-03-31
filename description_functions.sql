@@ -26,15 +26,15 @@ BEGIN
         FETCH cur_per INTO v_per;   -- put the cursor value into v_per
         EXIT WHEN cur_per%NOTFOUND; -- exit condition when cursor is empty
         DBMS_OUTPUT.PUT_LINE('Peripheral - ID : ' || v_per.id ||
-                             ', Description : ' || v_per.description ||
-                             ', Type : ' || v_per.type ||
+                            ', Description : ' || v_per.description ||
+                            ', Type : ' || v_per.type ||
                              ', Price : ' || v_per.price ||
                              ', Buying Date : ' || TO_CHAR(v_per.buying_date, 'YYYY-MM-DD'));
     END LOOP;
-    CLOSE(cur_per); -- close cursor
+    CLOSE cur_per; -- close cursor
 
     -- Shows the related license
-    SELECT ld.id, ld.price, ld.expiration_date, ld.buying_date 
+    SELECT ld.*
     INTO license 
     FROM LICENCE_DEVICE ld, DEVICE d    -- Affectation INTO license variable
     WHERE ld.id = d.id_licence_device
@@ -55,13 +55,14 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('VM - ID : ' || v_vm.id ||
                              ', Description : ' || v_vm.description);
     END LOOP;
-    CLOSE(cur_vm);  -- close cursor
+    CLOSE cur_vm;  -- close cursor
 
     EXCEPTION
     WHEN NO_DATA_FOUND THEN
         RAISE_APPLICATION_ERROR(-20001, 'No data found for peripherals, license or VMs');
     
-END get_all_info_device;/
+END get_all_info_device;
+/
 
 
 
@@ -85,7 +86,7 @@ IS
     FROM PERIPHERAL p, DEVICE d
     WHERE d.id = p.id_device
     AND d.id_network = v_id_network;
-    v_per cur_perm%ROWTYPE;
+    v_per cur_per%ROWTYPE;
 
     -- Cursor for the VMs
     CURSOR cur_vm IS
@@ -110,7 +111,7 @@ BEGIN
                              ', Buying Date : ' || TO_CHAR(v_dev.buying_date, 'YYYY-MM-DD') ||
                              ', Guaranty Expiration Date : ' || TO_CHAR(v_dev.guaranty_expiration_date, 'YYYY-MM-DD'));
     END LOOP;
-    CLOSE(cur_dev); -- close cursor
+    CLOSE cur_dev; -- close cursor
 
     -- Shows related peripherals
     DBMS_OUTPUT.PUT_LINE('List of peripherals related to the network : ' || v_id_network);
@@ -124,7 +125,7 @@ BEGIN
                              ', Price : ' || v_per.price ||
                              ', Buying Date : ' || TO_CHAR(v_per.buying_date, 'YYYY-MM-DD'));
     END LOOP;
-    CLOSE(cur_per); -- close cursor
+    CLOSE cur_per; -- close cursor
 
     -- Shows related VMs
     DBMS_OUTPUT.PUT_LINE('List of VMs related to the network : ' || v_id_network);
@@ -135,12 +136,13 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('VM - ID : ' || v_vm.id ||
                              ', Description : ' || v_vm.description);
     END LOOP;
-    CLOSE(cur_vm);  -- close cursor
+    CLOSE cur_vm;  -- close cursor
 
     EXCEPTION
     WHEN NO_DATA_FOUND THEN
         RAISE_APPLICATION_ERROR(-20001, 'No data found for peripherals, devices or VMs');
-END get_all_network_infos;/
+END get_all_network_infos;
+/
 
 
 
@@ -167,7 +169,8 @@ BEGIN
     EXCEPTION
     WHEN NO_DATA_FOUND THEN
         RAISE_APPLICATION_ERROR(-20001, 'No license for this device');
-END get_left_days_license;/
+END get_left_days_license;
+/
 
 
 
@@ -195,7 +198,8 @@ BEGIN
     EXCEPTION
     WHEN NO_DATA_FOUND THEN
         RAISE_APPLICATION_ERROR(-20001, 'No permission for this group.');
-END get_group_rights;/
+END get_group_rights;
+/
 
 
 
@@ -211,7 +215,7 @@ IS
     AND ugp.id_user = v_id_user;
     v_perm cur_perm%ROWTYPE;
 
-    v_id_group GROUPS%id;
+    v_id_group GROUPS.ID%TYPE;
 BEGIN
     SELECT id_group 
     INTO v_id_group 
@@ -233,7 +237,5 @@ BEGIN
     EXCEPTION
     WHEN NO_DATA_FOUND THEN
         RAISE_APPLICATION_ERROR(-20001, 'No permission for this user.');
-END get_group_rights;/
-
-
-
+END get_user_rights;
+/
