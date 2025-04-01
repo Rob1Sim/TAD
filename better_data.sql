@@ -71,12 +71,10 @@ BEGIN
 
             
             -- Insérer dans la table USER_GROUP_PERMISSIONS
-            INSERT INTO USER_GROUP_PERMISSIONS (id_user, id_permission, id_group)
-            VALUES (v_user_id, v_permission_id, v_group_id);
+            INSERT INTO USER_GROUP_PERMISSIONS (id, id_user, id_permission, id_group)
+            VALUES (USER_GROUP_PERMISSIONS_SEQ.NEXTVAL ,v_user_id, v_permission_id, v_group_id);
         END LOOP;
     END LOOP;
-
-
 
     
     -- Créer des projets
@@ -98,49 +96,39 @@ BEGIN
         v_license_price := 50 + (DBMS_RANDOM.VALUE(1, 100));  -- Prix de la licence entre 50 et 150
         v_license_expiration_date := SYSDATE + INTERVAL '1' YEAR + DBMS_RANDOM.VALUE(0, 365);  -- Date d'expiration dans 1 à 2 ans
         v_license_buying_date := SYSDATE - INTERVAL '30' DAY + DBMS_RANDOM.VALUE(0, 30);  -- Date d'achat dans les 30 derniers jours
-        
+        v_ticket_id := i;
+        v_project_id := MOD(i, NUMBER_OF_PROJECTS) + 1;  -- Répartition des tickets sur 3 projets
+        INSERT INTO VM (id, description, id_device)
+        VALUES (VM_SEQ.nextval, 'VM n°' || i, i);
+
         INSERT INTO LICENCE_DEVICE (id, price, expiration_date, buying_date, id_device)
         VALUES (i, v_license_price, v_license_expiration_date, v_license_buying_date, i);
 
         INSERT INTO DEVICE (id, description, type, price, ip_address, buying_date, guaranty_expiration_date, id_network, id_licence_device)
         VALUES (i, v_device_description, 'Type ' || i, 100 + i, '192.168.' || v_network_id || '.' || (i + 10), SYSDATE, SYSDATE + INTERVAL '1' YEAR, v_network_id, i);
-    END LOOP;
-
-    -- Créer des tickets et les associer à des dispositifs
-    FOR i IN 1..NUMBER_OF_DEVICES LOOP
-        v_ticket_id := i;
-        v_project_id := MOD(i, NUMBER_OF_PROJECTS) + 1;  -- Répartition des tickets sur 3 projets
-        
         INSERT INTO TICKET (id, subject, description, statut, ticket_creation_date, id_created_by, id_project)
         VALUES (v_ticket_id, 'Ticket ' || v_ticket_id, 'Ticket for Device ' || i, 'OPEN', SYSDATE, NULL, v_project_id);
-    END LOOP;
 
-    -- Associer 3 périphériques à chaque dispositif
-    FOR i IN 1..NUMBER_OF_DEVICES LOOP
+        -- Associer 3 périphériques à chaque dispositif
         FOR j IN 1..3 LOOP
             v_peripheral_id := (i - 1) * 3 + j;
             v_peripheral_description := 'Peripheral ' || v_peripheral_id || ' for Device ' || i;
             
             INSERT INTO PERIPHERAL (id, description, type, price, buying_date, id_device)
             VALUES (v_peripheral_id, v_peripheral_description, 'Peripheral Type', 50 + j, SYSDATE, i);
+            END LOOP;
+
+            -- Créer des interventions et les associer à des dispositifs et des tickets
+            FOR j IN 1..5 LOOP
+                v_intervention_id := (i - 1) * 5 + j;
+                
+                INSERT INTO INTERVENTION (id, inter_date, price, description, type, id_device)
+                VALUES (v_intervention_id, SYSDATE + (j / 2), 150 + j, 'Intervention for Device ' || i, 'Maintenance', i);
+                -- Associer une intervention à un ticket de manière aléatoire
+                INSERT INTO AFFECTATION (id, date_affectation, id_user, id_intervention, id_ticket)
+                VALUES (v_intervention_id, SYSDATE, j, v_intervention_id, i);
+            END LOOP;
         END LOOP;
-    END LOOP;
-
-    -- Créer des interventions et les associer à des dispositifs et des tickets
-    FOR i IN 1..NUMBER_OF_DEVICES LOOP
-        FOR j IN 1..5 LOOP
-            v_intervention_id := (i - 1) * 5 + j;
-            
-            INSERT INTO INTERVENTION (id, inter_date, price, description, type, id_device)
-            VALUES (v_intervention_id, SYSDATE + (j / 2), 150 + j, 'Intervention for Device ' || i, 'Maintenance', i);
-            
-            -- Associer une intervention à un ticket de manière aléatoire
-            INSERT INTO AFFECTATION (id, date_affectation, id_user, id_intervention, id_ticket)
-            VALUES (v_intervention_id, SYSDATE, j, v_intervention_id, i);
-        END LOOP;
-    END LOOP;
-
-
 
 
 

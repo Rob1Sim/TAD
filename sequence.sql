@@ -1,0 +1,9 @@
+CREATE SEQUENCE user_group_permissions_seq
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE;
+
+CREATE SEQUENCE vm_seq
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE;
