@@ -214,16 +214,12 @@ IS
     WHERE p.id = ugp.id_permission
     AND ugp.id_user = v_id_user;
     v_perm cur_perm%ROWTYPE;
-
-    v_id_group GROUPS.ID%TYPE;
 BEGIN
-    SELECT id_group 
-    INTO v_id_group 
-    FROM USER_GROUP_PERMISSIONS -- gets the group id related to the user 
-    WHERE id_user = v_id_user; 
 
     DBMS_OUTPUT.PUT_LINE('List of permissions for group related to the user : ' || v_id_user);
-    get_group_rights(v_id_group); -- using previous procedure to show the permissions related to the group
+        FOR rec IN ( SELECT id_group FROM USER_GROUP_PERMISSIONS WHERE id_user = v_id_user) LOOP
+        get_group_rights(rec.id_group);
+    END LOOP; -- using previous procedure to show the permissions related to the group
 
     DBMS_OUTPUT.PUT_LINE('List of permissions for the user : ' || v_id_user);
     OPEN cur_perm;  -- open the cursor explicitly
