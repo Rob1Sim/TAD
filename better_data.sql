@@ -35,7 +35,7 @@ BEGIN
         -- Créer des groupes
     FOR i IN 1..NUMBER_OF_GROUPS LOOP
         INSERT INTO GROUPS (id, name)
-        VALUES (i, 'Group ' || i);
+        VALUES (seq_groups_id.nextval, 'Group ' || i);
     END LOOP;
 
     -- Créer des utilisateurs avec des noms générés aléatoirement
@@ -46,13 +46,13 @@ BEGIN
 
         -- Créer l'utilisateur avec un nom et prénom aléatoire
         INSERT INTO GLPI_USER (id, last_name, first_name)
-        VALUES (i, v_last_name, v_first_name);
+        VALUES (seq_glpi_user_id.NEXTVAL, v_last_name, v_first_name);
     END LOOP;
 
     -- Créer des permissions
     FOR i IN 1..NUMBER_OF_PERMISSIONS LOOP
         INSERT INTO PERMISSIONS (id, name)
-        VALUES (i, 'Permission ' || i);
+        VALUES (seq_permissions_id.nextval, 'Permission ' || i);
     END LOOP;
 
     -- Associer les utilisateurs aux groupes et permissions aléatoirement
@@ -72,7 +72,7 @@ BEGIN
             
             -- Insérer dans la table USER_GROUP_PERMISSIONS
             INSERT INTO USER_GROUP_PERMISSIONS (id, id_user, id_permission, id_group)
-            VALUES (USER_GROUP_PERMISSIONS_SEQ.NEXTVAL ,v_user_id, v_permission_id, v_group_id);
+            VALUES (SEQ_GROUP_PERMISSIONS_ID.NEXTVAL ,v_user_id, v_permission_id, v_group_id);
         END LOOP;
     END LOOP;
 
@@ -80,13 +80,13 @@ BEGIN
     -- Créer des projets
     FOR i IN 1..NUMBER_OF_PROJECTS LOOP
         INSERT INTO PROJECT (id, name, description, creation_date)
-        VALUES (i, 'Project ' || i, 'Description for Project ' || i, SYSDATE);
+        VALUES (seq_project_id.nextval, 'Project ' || i, 'Description for Project ' || i, SYSDATE);
     END LOOP;
 
     -- Créer des réseaux
     FOR i IN 1..NUMBER_OF_NETWORKS LOOP
         INSERT INTO NETWORK (id, name, alias, ip_address, ip_mask)
-        VALUES (i, 'Network ' || i, 'Alias ' || i, '192.168.' || i || '.1', '255.255.255.0');
+        VALUES (seq_network_id.nextval, 'Network ' || i, 'Alias ' || i, '192.168.' || i || '.1', '255.255.255.0');
     END LOOP;
 
     -- Créer des dispositifs et les associer à un réseau
@@ -96,22 +96,22 @@ BEGIN
         v_license_price := 50 + (DBMS_RANDOM.VALUE(1, 100));  -- Prix de la licence entre 50 et 150
         v_license_expiration_date := SYSDATE + INTERVAL '1' YEAR + DBMS_RANDOM.VALUE(0, 365);  -- Date d'expiration dans 1 à 2 ans
         v_license_buying_date := SYSDATE - INTERVAL '30' DAY + DBMS_RANDOM.VALUE(0, 30);  -- Date d'achat dans les 30 derniers jours
-        v_ticket_id := i;
+        v_ticket_id := seq_ticket_id.nextval;
         v_project_id := MOD(i, NUMBER_OF_PROJECTS) + 1;  -- Répartition des tickets sur 3 projets
         INSERT INTO VM (id, description, id_device)
-        VALUES (VM_SEQ.nextval, 'VM n°' || i, i);
+        VALUES (seq_vm_id.nextval, 'VM n°' || i, i);
 
         INSERT INTO LICENCE_DEVICE (id, price, expiration_date, buying_date, id_device)
-        VALUES (i, v_license_price, v_license_expiration_date, v_license_buying_date, i);
+        VALUES (seq_licence_device_id.nextval, v_license_price, v_license_expiration_date, v_license_buying_date, i);
 
         INSERT INTO DEVICE (id, description, type, price, ip_address, buying_date, guaranty_expiration_date, id_network, id_licence_device)
-        VALUES (i, v_device_description, 'Type ' || i, 100 + i, '192.168.' || v_network_id || '.' || (i + 10), SYSDATE, SYSDATE + INTERVAL '1' YEAR, v_network_id, i);
+        VALUES (seq_device_id.nextval, v_device_description, 'Type ' || i, 100 + i, '192.168.' || v_network_id || '.' || (i + 10), SYSDATE, SYSDATE + INTERVAL '1' YEAR, v_network_id, i);
         INSERT INTO TICKET (id, subject, description, statut, ticket_creation_date, id_created_by, id_project)
         VALUES (v_ticket_id, 'Ticket ' || v_ticket_id, 'Ticket for Device ' || i, 'OPEN', SYSDATE, NULL, v_project_id);
 
         -- Associer 3 périphériques à chaque dispositif
         FOR j IN 1..3 LOOP
-            v_peripheral_id := (i - 1) * 3 + j;
+            v_peripheral_id := seq_peripheral_id.nextval;
             v_peripheral_description := 'Peripheral ' || v_peripheral_id || ' for Device ' || i;
             
             INSERT INTO PERIPHERAL (id, description, type, price, buying_date, id_device)
@@ -120,7 +120,7 @@ BEGIN
 
             -- Créer des interventions et les associer à des dispositifs et des tickets
             FOR j IN 1..5 LOOP
-                v_intervention_id := (i - 1) * 5 + j;
+                v_intervention_id := seq_intervention_id.nextval;
                 
                 INSERT INTO INTERVENTION (id, inter_date, price, description, type, id_device)
                 VALUES (v_intervention_id, SYSDATE + (j / 2), 150 + j, 'Intervention for Device ' || i, 'Maintenance', i);
