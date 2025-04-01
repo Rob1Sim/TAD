@@ -36,11 +36,11 @@ EXEC make_close_ticket(3);
 SELECT * FROM TICKET WHERE statut = 'opened';
 SELECT * FROM TICKET WHERE statut = 'closed';
 EXEC Date_ticket(TO_DATE('2025-01-15', 'YYYY-MM-DD'));
-DBMS_OUTPUT.PUT_LINE('Le prix total du projet est : ' || project_price(1));
+SELECT project_price(1) FROM dual;
 --Sélectionner tous les tickets avec un statut précis.
 
 SELECT * FROM TICKET WHERE statut = 'opened';
 SELECT * FROM TICKET WHERE statut = 'closed';
 
 --toute les dépenses entre deux dates
-EXEC total_depenses_func(TO_DATE('2025-04-01', 'YYYY-MM-DD'), TO_DATE('2025-04-02', 'YYYY-MM-DD'))
+SELECT total_depenses_func(TO_DATE('2025-04-01', 'YYYY-MM-DD'), TO_DATE('2025-04-02', 'YYYY-MM-DD')) FROM dual;
