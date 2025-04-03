@@ -3,10 +3,12 @@ DROP TABLE VM CASCADE CONSTRAINTS;
 DROP TABLE LICENCE_DEVICE CASCADE CONSTRAINTS;
 DROP TABLE INTERVENTION CASCADE CONSTRAINTS;
 DROP TABLE DEVICE CASCADE CONSTRAINTS;
+DROP TABLE TICKET CASCADE CONSTRAINTS;
+DROP TABLE GLPI_USER CASCADE CONSTRAINTS;
+DROP TABLE AFFECTATION CASCADE CONSTRAINTS;
 
-
--- Cluster 1 : DEVICE et ses dépendants (PERIPHERAL, VM, LICENCE_DEVICE, INTERVENTION)
--- parceque Toutes ces tables partagent la colonne id_device et sont fréquemment jointes pour obtenir l'état ou l'inventaire d'un appareil.
+-- Cluster 1 : DEVICE et ses dépendants (PERIPHERAL, VM, LICENCE_DEVICE)
+-- parce que toutes ces tables partagent la colonne id_device et sont fréquemment jointes pour obtenir l'état ou l'inventaire d'un appareil.
 -- Le cluster permet de stocker ensemble les lignes qui partagent le même id_device, améliorant la performance des jointures.
 CREATE CLUSTER cluster_device (id_device NUMBER)
 SIZE 1024
@@ -48,6 +50,40 @@ CREATE TABLE LICENCE_DEVICE (
     id_device NUMBER
 ) CLUSTER cluster_device (id_device);
 
+-- Cluster 2 : GLPI_USER et TICKET
+-- parce que les tickets sont fréquemment reliés à un utilisateur via une clé étrangère (id_created_by).
+-- Le cluster permet de stocker ensemble les tickets et leurs auteurs, améliorant l'efficacité des recherches utilisateur/ticket.
+CREATE CLUSTER cluster_user_ticket (id NUMBER)
+SIZE 1024
+TABLESPACE User_group;
+
+CREATE INDEX idx_cluster_user_ticket ON CLUSTER cluster_user_ticket;
+
+CREATE TABLE GLPI_USER (
+    id NUMBER PRIMARY KEY,
+    last_name VARCHAR2(100),
+    first_name VARCHAR2(100)
+) CLUSTER cluster_user_ticket (id);
+
+CREATE TABLE TICKET (
+    id NUMBER PRIMARY KEY,
+    subject VARCHAR2(255),
+    description VARCHAR2(255),
+    statut VARCHAR2(50) DEFAULT 'OPEN',
+    ticket_creation_date DATE DEFAULT SYSDATE,
+    id_created_by NUMBER,
+    id_project NUMBER
+) CLUSTER cluster_user_ticket (id_created_by);
+
+-- Cluster 3 : INTERVENTION et AFFECTATION
+-- parce que les affectations d'utilisateurs à des interventions sont fréquentes.
+-- Le cluster améliore les performances de requêtes comme "quelles affectations sont liées à une intervention donnée ?"
+CREATE CLUSTER cluster_intervention (id_intervention NUMBER)
+SIZE 1024
+TABLESPACE Project_management;
+
+CREATE INDEX idx_cluster_intervention ON CLUSTER cluster_intervention;
+
 CREATE TABLE INTERVENTION (
     id NUMBER PRIMARY KEY,
     inter_date DATE,
@@ -55,16 +91,7 @@ CREATE TABLE INTERVENTION (
     description VARCHAR2(255),
     type VARCHAR2(50),
     id_device NUMBER NOT NULL
-) CLUSTER cluster_device (id_device);
-
--- Cluster 2 : INTERVENTION et AFFECTATION
--- parcque Les affectations d'utilisateurs à des interventions sont fréquentes.
--- Le cluster améliore les performances de requêtes comme "quelles affectations sont liées à une intervention donnée ?"
-CREATE CLUSTER cluster_intervention (id_intervention NUMBER)
-SIZE 1024
-TABLESPACE Project_management;
-
-CREATE INDEX idx_cluster_intervention ON CLUSTER cluster_intervention;
+) CLUSTER cluster_intervention (id);
 
 CREATE TABLE AFFECTATION (
     id NUMBER PRIMARY KEY,
