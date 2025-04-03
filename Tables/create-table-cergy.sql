@@ -40,3 +40,5 @@ CREATE TABLE USER_GROUP_PERMISSIONS (
         id_user IS NOT NULL OR id_group IS NOT NULL
     )
 ) TABLESPACE User_group;
+
+COMMIT;

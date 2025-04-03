@@ -47,3 +47,4 @@ GRANT Project_manager, Client TO project_manager_jean_pierre;
 
 GRANT Accountant TO accountant_jolyne;
 
+COMMIT;

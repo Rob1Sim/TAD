@@ -12,3 +12,4 @@ CREATE ROLE Client;
 
 GRANT DBA to Admin;
 
+COMMIT;

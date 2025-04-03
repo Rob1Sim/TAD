@@ -40,3 +40,4 @@ GRANT Machine_technician, Network_technician, Technical_manager, Client TO techn
 GRANT Project_manager, Client TO project_manager_josuke;
 
 GRANT Accountant TO accountant_kakyoin;
+COMMIT;
