@@ -1,4 +1,5 @@
 @../optimisation/table-spaces.sql
+@../roles/role-all.sql
 @../roles/role-pau.sql
 @../optimisation/sequence.sql
 @../Tables/create-tables-all.sql
