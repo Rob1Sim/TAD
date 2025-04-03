@@ -19,4 +19,3 @@ CREATE INDEX ind_license_exp_date ON LICENCE_DEVICE(expiration_date ASC);
 
 -- B-tree Index on the intervention date of the INTERVENTION table.
 CREATE INDEX ind_intervention_date ON INTERVENTION(inter_date ASC);
-COMMIT;

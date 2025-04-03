@@ -1,9 +1,8 @@
 @optimisation/table-spaces.sql
 @roles/role-pau.sql
 @optimisation/sequence.sql
-@Tables/create-table-all.sql
-@Tables/create-finance-views.sql
-@fragmentation/fragmentation-pau.sql
+@Tables/create-tables-all.sql
+@Tables/create-finance-view.sql
 @optimisation/index-all.sql
 @roles/grant-role.sql
 

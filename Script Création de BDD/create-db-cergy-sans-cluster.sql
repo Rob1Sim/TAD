@@ -1,9 +1,8 @@
 @optimisation/table-spaces.sql
 @roles/role-cergy.sql
 @optimisation/sequence.sql
-@Tables/create-table-cergy.sql
-@Tables/create-finance-views.sql
-@fragmentation/fragmentation-cergy.sql
+@Tables/create-tables-cergy.sql
+@Tables/create-finance-view.sql
 @optimisation/index-cergy.sql
 @roles/grant-role.sql
 

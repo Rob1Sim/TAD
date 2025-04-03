@@ -10,7 +10,6 @@ CREATE USER technical_manager_jotaro IDENTIFIED BY password;
 CREATE USER project_manager_jean_pierre IDENTIFIED BY password;
 CREATE USER client_iggy IDENTIFIED BY password;
 CREATE USER client_okuyasu IDENTIFIED BY password;
-CREATE USER project_manager_josuke IDENTIFIED BY password;
 CREATE USER client_johnny IDENTIFIED BY password;
 
 CREATE USER network_technician_cesar IDENTIFIED BY password;
@@ -28,7 +27,6 @@ GRANT CONNECT TO technical_manager_jotaro;
 GRANT CONNECT TO project_manager_jean_pierre;
 GRANT CONNECT TO client_iggy;
 GRANT CONNECT TO client_okuyasu;
-GRANT CONNECT TO project_manager_josuke;
 GRANT CONNECT TO client_johnny;
 GRANT CONNECT TO network_technician_cesar;
 GRANT CONNECT TO machine_technician_kars;
@@ -47,4 +45,3 @@ GRANT Project_manager, Client TO project_manager_jean_pierre;
 
 GRANT Accountant TO accountant_jolyne;
 
-COMMIT;

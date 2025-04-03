@@ -36,6 +36,4 @@ GRANT SELECT ON Prix_Device TO Accountant;
 GRANT SELECT ON Prix_Peripheral TO Accountant;
 GRANT SELECT ON Prix_Licence TO Accountant;
 GRANT SELECT ON Prix_Intervention TO Accountant;
-GRANT SELECT ON MV_ALL_DEVICES TO Technical_manager;
 
-COMMIT;
