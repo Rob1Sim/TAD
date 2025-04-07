@@ -45,7 +45,7 @@ END;
 CREATE OR REPLACE FUNCTION setup_price (id_device NUMBER)
 RETURN NUMBER
 IS 
-    res NUMBER := 0;
+    res NUMBER(10, 2) := 0;
 BEGIN
     -- Récupération du prix de l'appareil
     BEGIN

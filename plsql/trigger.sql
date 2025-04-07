@@ -54,7 +54,6 @@ END;
 
 CREATE OR REPLACE TRIGGER trg_close_ticket_when_all_interventions_done
 AFTER UPDATE OF type ON INTERVENTION
-FOR EACH ROW
 DECLARE
     v_ticket_id TICKET.id%TYPE;
     v_count_open NUMBER;
@@ -63,7 +62,7 @@ BEGIN
     SELECT id_ticket
     INTO v_ticket_id
     FROM AFFECTATION
-    WHERE id_intervention = :NEW.id
+    WHERE id_intervention = id
     FETCH FIRST 1 ROWS ONLY;
 
     -- Vérifier s'il reste des interventions NON clôturées pour ce ticket

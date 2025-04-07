@@ -107,7 +107,7 @@ BEGIN
         INSERT INTO DEVICE (id, description, type, price, ip_address, buying_date, guaranty_expiration_date, id_network, id_licence_device)
         VALUES (seq_device_id.nextval, v_device_description, 'Type ' || i, 100 + i, '192.168.' || v_network_id || '.' || (i + 10), SYSDATE, SYSDATE + INTERVAL '1' YEAR, v_network_id, i);
         INSERT INTO TICKET (id, subject, description, statut, ticket_creation_date, id_created_by, id_project)
-        VALUES (v_ticket_id, 'Ticket ' || v_ticket_id, 'Ticket for Device ' || i, 'OPEN', SYSDATE, NULL, v_project_id);
+        VALUES (v_ticket_id, 'Ticket ' || v_ticket_id, 'Ticket for Device ' || i, 'OPEN', SYSDATE, 1, v_project_id);
 
         -- Associer 3 périphériques à chaque dispositif
         FOR j IN 1..3 LOOP
