@@ -30,24 +30,62 @@ END;
 
 CREATE OR REPLACE TRIGGER trg_close_project_when_tickets_closed
 AFTER UPDATE OF statut ON TICKET
-FOR EACH ROW
 DECLARE
+    CURSOR c_projects IS
+        SELECT DISTINCT id_project
+        FROM TICKET
+        WHERE statut = 'CLOSE'
+          AND id_project IS NOT NULL;
     v_count_open NUMBER;
 BEGIN
-    -- Vérifie s'il reste des tickets ouverts pour ce projet
-    SELECT COUNT(*)
-    INTO v_count_open
-    FROM TICKET
-    WHERE id_project = :NEW.id_project
-      AND statut != 'CLOSE';
+    FOR rec IN c_projects LOOP
+        SELECT COUNT(*) INTO v_count_open
+        FROM TICKET
+        WHERE id_project = rec.id_project
+          AND statut != 'CLOSE';
 
-    -- Si aucun ticket ouvert et que projet existe, on modifie sa description
-    IF v_count_open = 0 AND :NEW.id_project IS NOT NULL THEN
-        UPDATE PROJECT
-        SET description = description || ' PROJET TERMINÉ'
-        WHERE id = :NEW.id_project
-          AND description NOT LIKE '%PROJET TERMINÉ';
-    END IF;
+        IF v_count_open = 0 THEN
+            UPDATE PROJECT
+            SET description = description || ' PROJET TERMINÉ'
+            WHERE id = rec.id_project
+              AND description NOT LIKE '%PROJET TERMINÉ';
+        END IF;
+    END LOOP;
+END;
+/
+
+CREATE OR REPLACE TRIGGER trg_close_ticket_when_all_interventions_done
+AFTER UPDATE OF type ON INTERVENTION
+DECLARE
+    CURSOR c_tickets IS
+        SELECT DISTINCT a.id_ticket
+        FROM AFFECTATION a
+        JOIN INTERVENTION i ON a.id_intervention = i.id
+        WHERE i.type = 'CLOTUREE'
+          AND i.id IN (
+              SELECT id
+              FROM INTERVENTION
+              WHERE type = 'CLOTUREE'
+                AND id IN (SELECT id FROM INTERVENTION MINUS SELECT id FROM INTERVENTION WHERE type != 'CLOTUREE')
+          );
+
+    v_count_open NUMBER;
+BEGIN
+    FOR rec IN c_tickets LOOP
+        -- Vérifier s'il reste des interventions NON clôturées pour ce ticket
+        SELECT COUNT(*)
+        INTO v_count_open
+        FROM AFFECTATION a
+        JOIN INTERVENTION i ON a.id_intervention = i.id
+        WHERE a.id_ticket = rec.id_ticket
+          AND UPPER(TRIM(i.type)) != 'CLOTUREE';
+
+        IF v_count_open = 0 THEN
+            UPDATE TICKET
+            SET statut = 'CLOSE'
+            WHERE id = rec.id_ticket;
+        END IF;
+    END LOOP;
 END;
 /
 
@@ -55,29 +93,82 @@ END;
 CREATE OR REPLACE TRIGGER trg_close_ticket_when_all_interventions_done
 AFTER UPDATE OF type ON INTERVENTION
 DECLARE
-    v_ticket_id TICKET.id%TYPE;
+    CURSOR c_interventions IS
+        SELECT DISTINCT a.id_ticket
+        FROM AFFECTATION a
+        JOIN INTERVENTION i ON a.id_intervention = i.id
+        WHERE i.type = 'CLOTUREE'
+          AND i.id IN (
+              SELECT id
+              FROM INTERVENTION
+              MINUS
+              SELECT id
+              FROM INTERVENTION
+              WHERE type != 'CLOTUREE'
+          );
     v_count_open NUMBER;
 BEGIN
-    -- Récupérer le ticket lié à cette intervention (s'il y en a un)
-    SELECT id_ticket
-    INTO v_ticket_id
-    FROM AFFECTATION
-    WHERE id_intervention = id
-    FETCH FIRST 1 ROWS ONLY;
+    FOR rec IN c_interventions LOOP
+        -- Vérifie s'il reste des interventions non clôturées pour ce ticket
+        SELECT COUNT(*)
+        INTO v_count_open
+        FROM AFFECTATION a
+        JOIN INTERVENTION i ON a.id_intervention = i.id
+        WHERE a.id_ticket = rec.id_ticket
+          AND UPPER(TRIM(i.type)) != 'CLOTUREE';
 
-    -- Vérifier s'il reste des interventions NON clôturées pour ce ticket
-    SELECT COUNT(*)
-    INTO v_count_open
-    FROM AFFECTATION a
-    JOIN INTERVENTION i ON a.id_intervention = i.id
-    WHERE a.id_ticket = v_ticket_id
-      AND UPPER(i.type) != 'CLÔTURÉE';
+        IF v_count_open = 0 THEN
+            UPDATE TICKET
+            SET statut = 'CLOSE'
+            WHERE id = rec.id_ticket;
+        END IF;
+    END LOOP;
+END;
+/
 
-    -- Si plus aucune intervention non clôturée → fermer le ticket
-    IF v_count_open = 0 THEN
-        UPDATE TICKET
-        SET statut = 'CLOSED'
-        WHERE id = v_ticket_id;
+
+
+CREATE OR REPLACE TRIGGER trg_check_project_open
+AFTER INSERT OR UPDATE OF statut ON TICKET
+FOR EACH ROW
+DECLARE
+    v_proj_desc PROJECT.description%TYPE;
+BEGIN
+    IF :NEW.statut = 'OPEN' THEN
+        SELECT description INTO v_proj_desc
+        FROM PROJECT
+        WHERE id = :NEW.id_project;
+
+        IF INSTR(v_proj_desc, ' (Projet clos)') > 0 THEN
+            UPDATE PROJECT
+            SET description = REPLACE(description, ' (Projet clos)', '')
+            WHERE id = :NEW.id_project;
+        END IF;
     END IF;
 END;
 /
+
+
+CREATE OR REPLACE TRIGGER trg_update_ticket_status_on_affectation
+AFTER INSERT ON AFFECTATION
+FOR EACH ROW
+DECLARE
+    v_intervention_type INTERVENTION.type%TYPE;
+BEGIN
+    -- Récupérer le type de l'intervention associée
+    SELECT type INTO v_intervention_type
+    FROM INTERVENTION
+    WHERE id = :NEW.id_intervention;
+
+    -- Vérifier si le type d'intervention est 'Maintenance' ou 'OPEN'
+    IF v_intervention_type IN ('Maintenance', 'OPEN') THEN
+        -- Mettre à jour le statut du ticket en 'OPEN'
+        UPDATE TICKET
+        SET statut = 'OPEN'
+        WHERE id = :NEW.id_ticket;
+    END IF;
+END;
+/
+
+
+
